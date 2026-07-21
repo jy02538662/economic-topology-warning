@@ -209,17 +209,24 @@ Run the multi-crisis backtest:
 python scripts/multi_crisis_backtest.py
 ```
 
-Generated outputs:
+Generated curated outputs kept in the repository:
 
 ```text
 data/multi_crisis/summary.csv
+data/multi_crisis/multi_crisis_level_timeline.png
+data/multi_crisis/risk_reports/*_risk_report.txt
+```
+
+The script can also regenerate detailed per-window and sector CSV files. Those generated intermediate files are ignored by `.gitignore` to keep the public repository small:
+
+```text
 data/multi_crisis/dotcom_2000.csv
 data/multi_crisis/gfc_2008.csv
 data/multi_crisis/euro_debt_2011.csv
 data/multi_crisis/covid_2020.csv
-data/multi_crisis/multi_crisis_level_timeline.png
-data/multi_crisis/sectors/*_sector_summary.csv
-data/multi_crisis/risk_reports/*_risk_report.txt
+data/multi_crisis/sectors/
+data/yahoo_cache/
+data/stooq_cache/
 ```
 
 Run the 2026/2027 live topology monitor:

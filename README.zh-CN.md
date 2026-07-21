@@ -207,17 +207,24 @@ data/sp500_representative_topology_2007_2009.png
 python scripts/multi_crisis_backtest.py
 ```
 
-输出文件：
+仓库保留的精选输出文件：
 
 ```text
 data/multi_crisis/summary.csv
+data/multi_crisis/multi_crisis_level_timeline.png
+data/multi_crisis/risk_reports/*_risk_report.txt
+```
+
+脚本仍可重新生成详细窗口 CSV、行业 CSV 和行情缓存。为了保持公开仓库干净，这些中间文件已被 `.gitignore` 忽略：
+
+```text
 data/multi_crisis/dotcom_2000.csv
 data/multi_crisis/gfc_2008.csv
 data/multi_crisis/euro_debt_2011.csv
 data/multi_crisis/covid_2020.csv
-data/multi_crisis/multi_crisis_level_timeline.png
-data/multi_crisis/sectors/*_sector_summary.csv
-data/multi_crisis/risk_reports/*_risk_report.txt
+data/multi_crisis/sectors/
+data/yahoo_cache/
+data/stooq_cache/
 ```
 
 主窗口与行业窗口 CSV、以及每个危机的风险报告均保留原字段，并新增第一阶段量子潮水诊断字段、结构脆弱性判定字段与轻量调控建议：
