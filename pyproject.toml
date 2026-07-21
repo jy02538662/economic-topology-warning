@@ -1,0 +1,14 @@
+[project]
+name = "economic-topology"
+version = "0.1.0"
+description = "MVP rolling-window economic topology warning analyzer"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
