@@ -1,146 +1,215 @@
-# Economic Topology Warning MVP
+# Economic Topology Warning
 
-**一句话定位：这个框架不预测价格涨跌，而是检测高维资产收益状态空间是否发生“拓扑分裂/断裂”，用于研究金融危机前后的市场结构变化。**
+A non-commercial research prototype for topology-based financial crisis backtesting and 2026/2027 forward-looking market structure risk monitoring.
 
-当前版本是一个可运行的 research prototype：它把多只股票的滚动收益窗口看成高维点云，用一阶 Vietoris-Rips 图近似估计 `beta0`、`beta1` 和 `S_topo`，再用趋势分支、断裂分支、预警周期重置机制输出 `green/yellow/orange/red` 信号。
+This project does **not** predict price direction. It studies whether the high-dimensional financial market return space is becoming topologically fragmented, unstable, and synchronized before or during crisis regimes.
 
-## 它做什么、不做什么
+Chinese version: [README.zh-CN.md](README.zh-CN.md)
 
-做：
+## Core idea
 
-- 检测市场结构是否从“连通状态”走向“分裂状态”。
-- 比较拓扑信号与传统对照指标，例如平均相关性 `avg_corr`、平均波动率 `avg_vol`。
-- 在 2000、2008、2020 三类危机窗口上做探索性回测。
-- 输出可解释字段：`beta0`、`beta1`、`S_topo`、`fracture`、`cycle_status`、`avg_phase`、`phase_sync`、`topo_potential`、缺陷节点、风险链路、行业确认结果。
-
-不做：
-
-- 不预测明天涨跌。
-- 不直接给交易建议。
-- 不声称已经可以部署到真实风控系统。
-- 不声称当前 proxy 等价于完整 persistent homology。
-
-## 核心思想
-
-传统风险指标通常在市场共振后才变强：
+Traditional crisis indicators often become strong after systemic stress is already visible:
 
 ```text
-相关性升高 -> 大家一起跌
-波动率升高 -> 危机已经显性化
+correlation rises -> many assets start moving together
+volatility rises  -> market stress is already explicit
+drawdown appears  -> prices have already moved
 ```
 
-拓扑预警尝试观察更早的结构变化：
+This prototype asks a different question:
 
 ```text
-市场状态点云开始分裂
-局部连通性改变
-beta0 上升
-S_topo 下降
+Does the market state space start to fracture before the crash becomes obvious?
 ```
 
-换句话说，它研究的是：
+It treats rolling windows of asset returns as high-dimensional point clouds, builds a lightweight Vietoris-Rips 1-skeleton graph proxy, and estimates structural topology signals such as `beta0`, `beta1`, and `S_topo`.
+
+## What it does
+
+- Detects whether market structure moves from a connected state toward a fragmented state.
+- Compares topology signals against conventional controls such as average correlation `avg_corr` and average volatility `avg_vol`.
+- Runs exploratory crisis-window backtests for 2000 dotcom, 2008 GFC, 2011 euro debt, and 2020 COVID.
+- Adds phase-dynamics diagnostics: `avg_phase`, `phase_sync`, `topo_potential`, top defect nodes, and top risk links.
+- Adds sector-level confirmation and an experimental sector-escalated red candidate overlay.
+- Provides a live 2026/2027 forward-looking topology risk monitor.
+
+## What it does not do
+
+- It does not predict tomorrow's price direction.
+- It does not provide trading advice.
+- It does not claim production readiness for real risk systems.
+- It does not claim that the current graph proxy is equivalent to full persistent homology.
+
+## Current method
+
+The current MVP is intentionally lightweight and standard-library first:
+
+1. Load rolling windows of stock returns or economic indicator rows.
+2. Standardize each window with z-score normalization.
+3. Build a Vietoris-Rips 1-skeleton graph proxy.
+4. Estimate:
+   - `beta0`: connected components, used as a fragmentation proxy.
+   - `beta1`: graph cycle rank, used as a feedback-loop proxy.
+   - `S_topo`: an engineering proxy for topological stability.
+5. Combine trend branch, fracture branch, warning-cycle reset, sector confirmation, and phase diagnostics.
+6. Output warning levels:
 
 ```text
-市场是不是先“裂开”，然后才“一起崩”。
+green -> yellow -> orange -> red
 ```
 
-## 当前 MVP 做什么
+## Important limitations
 
-- 输入滚动窗口经济指标或股票成分股收益率。
-- 对窗口内状态点做 z-score 标准化。
-- 构建 Vietoris-Rips 1-skeleton 近似图。
-- 估计：
-  - `beta0`：连通分支数，代表状态空间是否分裂成多个岛屿。
-  - `beta1`：图循环秩，作为反馈回路 proxy。
-  - `S_topo`：拓扑稳定性 proxy。
-- 输出四色预警：`green / yellow / orange / red`。
-- 输出 top drivers，帮助追溯哪些股票/指标推动结构变化。
+This is a research prototype, not a validated financial risk product.
 
-## 重要边界
+- `beta0` and `beta1` are estimated from a graph-level approximation.
+- `S_topo` is an engineering proxy, not a mathematically complete persistence score.
+- The current universe is exploratory: 16 representative S&P 500 stocks for US windows and 17 European ADR / international large-cap proxies for the euro-debt window.
+- Results may be affected by sample size, survivorship bias, ticker availability, and threshold tuning.
+- Thresholds are exploratory and have not yet passed broad out-of-sample validation.
+- A future backend can replace the proxy with `ripser` or `gudhi` while keeping the outer pipeline stable.
 
-当前版本是标准库 MVP，不是完整 persistent homology：
+## Multi-crisis timeline
 
-- `beta0` 和 `beta1` 基于一阶图近似。
-- `S_topo` 是工程 proxy。
-- 当前股票池是探索性代表样本：美国窗口使用 16 只 S&P 500 代表股，欧洲窗口使用 17 只欧洲 ADR/国际大盘股 proxy，存在样本不足和幸存者偏差。
-- 阈值来自探索性调参，尚未完成 out-of-sample 验证。
-- 后续可以把内部后端替换为 `ripser` 或 `gudhi`，外层接口保持不变。
-
-## 多危机结果一图
-
-运行多危机回测后会生成：
+Running the multi-crisis backtest generates:
 
 ```text
 data/multi_crisis/multi_crisis_level_timeline.png
 ```
 
-该图展示 2000、2008、2011 欧债、2020 四个窗口的 `final_level` 随时间变化，并标注危机节点。
+The figure shows the `final_level` timeline for the 2000, 2008, 2011, and 2020 windows, with crisis markers and an experimental sector-escalated red candidate overlay.
 
 ![Multi-crisis topology warning timeline](data/multi_crisis/multi_crisis_level_timeline.png)
 
-## 回测结果摘要
+## Backtest summary
 
-当前 P0/P1/P2 + 跨市场验证结果。`行业红色候选*` 是实验字段：当市场进入有效预警周期，且预警附近至少 2 个 proxy sector 同步确认时，给出一个 sector-escalated red candidate；它不改写主 `final_level`。
+The table below summarizes the current P0/P1/P2 and cross-market exploratory validation. The `sector red candidate` is an experimental overlay: when an active market-level warning is confirmed by at least two proxy sectors near the warning window, the system marks a sector-escalated red candidate. It does not overwrite the main `final_level`.
 
-| 窗口 | 首次有效周期预警 | lead | 首次红色 | red lead | 行业红色候选* | candidate lead | 行业确认 | 一致性 |
-|------|------------------|------|----------|----------|----------------|----------------|----------|--------|
+| Window | First active warning | Lead | First red | Red lead | Sector red candidate | Candidate lead | Sector confirmation | Consistency |
+|--------|----------------------|------|-----------|----------|----------------------|----------------|---------------------|-------------|
 | 2000 dotcom | 2000-01-31 | 39d | 2000-04-03 | -24d | 2000-01-31 | 39d | warn: consumer_defensive + industrial_health; red: financials | warn 2/4; red 1/4 |
 | 2008 GFC | 2008-01-16 | 243d | 2008-01-16 | 243d | 2008-01-16 | 243d | warn/red: financials + technology | warn 2/4; red 2/4 |
 | 2011 euro debt | 2011-01-18 | 202d | 2011-11-02 | -86d | 2011-01-18 | 202d | warn: europe_technology + europe_defensive; red: europe_financials | warn 2/4; red 1/4 |
 | 2020 COVID | 2020-03-02 | -11d | 2020-03-02 | -11d | 2020-03-02 | -11d | broad: all four proxy sectors | warn 4/4; red 4/4 |
 
-解释：
+Interpretation:
 
-- 2000：慢变泡沫破裂，趋势分支给出约 39 天有效提前预警。
-- 2008：结构性金融危机，拓扑信号很早进入红色，但仍存在预警过早问题。
-- 2011：欧债窗口也出现提前趋势信号，说明框架不只依赖美国市场样本；红色阶段由欧洲金融组确认，但红色本身滞后。
-- 2020：COVID 是外生冲击，无法在冲击前预警，但断裂分支能在冲击后较快确认，且行业一致性达到 4/4。
+- **2000 dotcom:** slow bubble unwind; trend warnings accumulated before the crash window.
+- **2008 GFC:** systemic financial crisis; topology stress turned red very early, though the signal may be too early for direct operational use.
+- **2011 euro debt:** the European proxy universe also produced a pre-crisis trend warning, reducing the chance that the signal is purely US-specific.
+- **2020 COVID:** an external shock with limited pre-shock warning; the fracture branch reacted quickly after the shock became visible.
 
-## 预警机制
+## Warning mechanism
 
-多危机脚本使用三层机制：
+The multi-crisis script combines several layers:
 
-1. 趋势分支：综合 `beta0_z` 与 `S_topo` 下行形成趋势评分。
-2. 断裂分支：检测 5 个交易日内 `beta0` 累计跳变，并用 `avg_vol` 激增确认。
-3. 周期重置：短促、弱、很快恢复的预警周期会被取消，避免信号疲劳。
-4. 行业确认：在市场级首次预警/红色信号前后 30 天内，检查哪些 proxy sector 同步处于 active orange/red 状态。
-5. 相位动力学诊断：基于滚动窗口回撤映射节点风险相位，计算 `phase_sync`、`topo_potential`、`top_defect_nodes` 与 `top_risk_links`，用于定位风险同步、核心缺陷节点和潜在传导链路。
-6. 行业一致性实验：当市场有效预警附近至少 2 个行业同步确认时，输出 `sector_escalated_red_candidate`，并在总图中用红色虚线标注；该字段只用于研究对照，不改写主预警级别。
+1. **Trend branch:** combines `beta0_z` and weakening `S_topo` into a trend score.
+2. **Fracture branch:** detects rapid `beta0` jumps over a 5-trading-day lookback and confirms with a volatility spike.
+3. **Cycle reset:** cancels short, weak, quickly recovered warning cycles to reduce signal fatigue.
+4. **Sector confirmation:** checks which proxy sectors are active orange/red near market-level warning or red signals.
+5. **Phase diagnostics:** maps rolling-window drawdowns into risk phases and computes `phase_sync`, `topo_potential`, `top_defect_nodes`, and `top_risk_links`.
+6. **Sector consistency overlay:** emits `sector_escalated_red_candidate` when at least two sectors confirm around an active market warning. This is an experimental research field only.
 
-## 运行 demo
+## 2026/2027 forward-looking topology monitor
+
+The repository includes a live forward-looking entry point:
+
+```text
+scripts/live_forecast.py
+```
+
+It fetches roughly two years of recent representative US equity data, maps the current market state into rolling return point clouds, and outputs a topology risk snapshot for the 2026/2027 window.
+
+This is not a price forecast. It is a structural fragility monitor. The key question is:
+
+```text
+Around 2026/2027, is the market state space shifting from connected and recoverable toward fragmented, synchronized, and fragile?
+```
+
+### Forward-looking score inputs
+
+`forecast_from_record` combines the following structural signals:
+
+- `beta0_z`: abnormal rise in connected components, indicating stronger state-space fragmentation.
+- `s_z`: weakening `S_topo`, indicating reduced topological stability.
+- `phase_sync`: elevated phase synchronization, indicating cross-asset risk resonance.
+- `sector_warn_count`: sector-level confirmation.
+- `cycle_status` / `final_level`: whether the system is already inside an active warning cycle.
+
+The live monitor outputs:
+
+```text
+forecast_score, forecast_level, confidence, reason
+```
+
+The forward-looking levels are:
+
+```text
+low -> watch -> elevated -> high
+```
+
+### Scenario interpretation
+
+| Scenario | Topology state | Interpretation |
+|----------|----------------|----------------|
+| Baseline | `forecast_level = low` | The market point cloud remains relatively connected and stable. |
+| Watch | `forecast_level = watch` | Mild fragmentation or phase synchronization appears; continued monitoring is needed. |
+| Fragile | `forecast_level = elevated/high` | `beta0`, `S_topo`, phase synchrony, and sector confirmation jointly suggest a fragile structural regime. |
+
+Recommended public wording:
+
+> The 2026/2027 module does not forecast whether an index will rise or fall. It monitors whether the high-dimensional return space is entering a fragile topological regime that resembles historical pre-crisis or crisis-transition windows.
+
+## Installation
+
+This project requires Python 3.10 or newer. The core analyzer has no required third-party dependencies.
+
+Optional plotting support:
+
+```bash
+pip install -e ".[plot]"
+```
+
+For basic usage without optional plotting:
+
+```bash
+pip install -e .
+```
+
+## Quick start
+
+Run the small demo:
 
 ```bash
 python demo.py
 ```
 
-## 运行测试
+Run tests:
 
 ```bash
 python tests/test_analyzer.py
 ```
 
-## 运行 2007-2009 S&P 500 代表成分股回测
-
-脚本会从 Yahoo Chart 接口抓取 16 个代表性成分股的日线复权收盘价，计算日收益率后做 60 日滚动窗口拓扑分析，并输出普通对照指标：平均相关性 `avg_corr` 与平均波动率 `avg_vol`。如果本机安装了 `matplotlib`，会额外生成 PNG 图表。
+Run the 2007-2009 S&P 500 representative backtest:
 
 ```bash
 python scripts/sp500_2008_backtest.py
 ```
 
-输出文件：
+Generated outputs:
 
 ```text
 data/sp500_representative_topology_2007_2009.csv
 data/sp500_representative_topology_2007_2009.png
 ```
 
-## 运行多危机窗口回测
+Run the multi-crisis backtest:
 
 ```bash
 python scripts/multi_crisis_backtest.py
 ```
 
-输出文件：
+Generated outputs:
 
 ```text
 data/multi_crisis/summary.csv
@@ -153,30 +222,59 @@ data/multi_crisis/sectors/*_sector_summary.csv
 data/multi_crisis/risk_reports/*_risk_report.txt
 ```
 
-主窗口与行业窗口 CSV、以及每个危机的风险报告均保留原字段，并新增第一阶段量子潮水诊断字段、结构脆弱性判定字段与轻量调控建议：
+Run the 2026/2027 live topology monitor:
 
-```text
-avg_phase, phase_sync, topo_potential, top_defect_nodes, top_risk_links
-centralization_risk_gini, redundancy_risk, sync_risk, vulnerability_flags
-design_suggestions
+```bash
+python scripts/live_forecast.py
 ```
 
-## 适合对外讲的故事线
+Typical live output includes:
 
-> 金融危机不一定先表现为所有资产一起暴跌。某些危机中，市场状态空间会先出现拓扑分裂：一些资产群体开始脱钩、状态点云连通性下降、`beta0` 上升。这个框架尝试捕捉这种“结构先裂开”的信号，而不是预测价格本身。
+```text
+latest date
+current beta0 / beta1 / S_topo
+current green/yellow/orange/red topology warning level
+phase_sync / topo_potential
+forecast_score / forecast_level / confidence / reason
+best forecast over the recent 60-day window
+recent orange/red warning statistics
+combined forward-looking topology judgment
+```
 
-四类窗口对应四种模式：
+## Project structure
 
-- 2000：慢变泡沫，趋势信号逐步积累。
-- 2008：系统性金融危机，结构异常持续较久且红色信号明显提前。
-- 2011：欧债危机，欧洲 proxy 样本出现提前趋势信号，金融组在红色阶段确认。
-- 2020：外生冲击，事前难以预警，但断裂分支能快速确认。
+```text
+economic_topology/
+  econ_topology/
+    analyzer.py          # rolling topology analyzer
+    phase_dynamics.py    # phase synchronization and risk-link diagnostics
+  scripts/
+    sp500_2008_backtest.py
+    multi_crisis_backtest.py
+    live_forecast.py
+  tests/
+    test_analyzer.py
+  README.md
+  README.zh-CN.md
+  STORY_BRIEF.md
+  LICENSE
+  pyproject.toml
+```
 
-## 后续升级建议
+## Suggested research roadmap
 
-1. 扩展到 S&P 100、STOXX Europe 代表股或更完整的历史成分股，减少样本不足和幸存者偏差。
-2. 增加更多跨市场窗口，例如亚洲金融危机、欧债危机细分阶段、英国脱欧冲击。
-3. 替换 proxy 后端为真实 persistent homology，例如 `ripser`/`gudhi`。
-4. 增加对照基准：VIX、VSTOXX、最大回撤、滚动相关性、滚动协方差矩阵特征值。
-5. 做 leave-one-crisis-out 验证，降低阈值调参争议。
-6. 把行业一致性从解释字段升级为可选红色触发规则，并用 out-of-sample 验证避免过拟合。
+1. Expand the universe to S&P 100, STOXX Europe, or larger historical constituent sets.
+2. Add more cross-market windows, such as the Asian financial crisis, Brexit, and additional euro-debt subperiods.
+3. Replace the graph proxy with true persistent homology via `ripser` or `gudhi`.
+4. Add stronger baselines: VIX, VSTOXX, max drawdown, rolling covariance eigenvalues, and correlation-network metrics.
+5. Run leave-one-crisis-out validation to reduce threshold overfitting concerns.
+6. Promote sector consistency from an explanatory overlay to an optional trigger rule only after out-of-sample validation.
+7. Keep a separate forward-looking log for 2026/2027 snapshots instead of freezing one market judgment inside the README.
+
+## License
+
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). Non-commercial use is permitted. Commercial use requires separate permission.
+
+## Disclaimer
+
+This repository is for research and educational purposes only. It is not financial advice, investment advice, trading advice, or a production risk-management system. Historical exploratory results do not imply future performance.

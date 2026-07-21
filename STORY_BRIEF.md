@@ -39,6 +39,32 @@ Rolling stock returns
 | 2011 euro debt | sovereign/financial stress | Europe proxy universe shows pre-crisis trend warning | first warning: 2011-01-18, 202d lead | technology/defensive near warning; financials near red |
 | 2020 COVID | external shock | little pre-shock deformation; rapid post-shock fracture | fracture red: 2020-03-02, 11d after marker | broad all-sector confirmation |
 
+## 2026/2027 forward-looking angle
+
+The repository also includes a live forward-looking monitor in `scripts/live_forecast.py`. It is designed for the 2026/2027 risk window, but it should not be presented as an index or price prediction.
+
+The correct claim is:
+
+> The 2026/2027 module monitors whether the current market return space is becoming topologically fragile: more fragmented, less stable, more phase-synchronized, and more sector-confirmed.
+
+The forward-looking score combines:
+
+- `beta0_z`: abnormal rise in connected components.
+- `s_z`: weakening topological stability.
+- `phase_sync`: cross-asset risk phase resonance.
+- sector confirmation: whether multiple proxy sectors confirm the warning state.
+- active vulnerability flags: whether the market is already inside an active warning cycle.
+
+Output levels:
+
+```text
+low -> watch -> elevated -> high
+```
+
+Recommended public wording:
+
+> For 2026/2027, this project does not forecast market direction. It tracks whether market structure is entering a fragile topological regime that historically resembles pre-crisis or crisis-transition windows.
+
 ## Key visual
 
 Use this generated figure in presentations:
