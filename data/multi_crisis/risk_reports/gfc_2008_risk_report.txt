@@ -1,0 +1,24 @@
+window: gfc_2008
+crisis_date: 2008-09-15
+trigger_date: 2008-01-16
+trigger_level: red
+phase_sync: 0.8118135431768434
+topo_potential: -37.91406199874547
+top_defect_nodes: c:0.864387;ko:0.611805;jnj:0.611559;wmt:0.514211;pg:0.476259
+top_risk_links: bac-jpm:0.831105;bac-gs:0.727155;ge-jpm:0.710853
+sector_warn_confirmed: financials+technology
+sector_red_confirmed: financials+technology
+centralization_risk_gini: 0.113553
+redundancy_threshold_beta1_p20: 388.000000
+redundancy_risk: 0
+sync_risk: 1
+vulnerability_flags: phase_resonance
+design_suggestions:
+- reduce_coupling_on_defect_nodes:c,ko,jnj; action=review/highest-correlated exposures
+- split_strong_synchronous_links:bac-jpm,bac-gs,ge-jpm; action=cap/rebalance 20-30pct link weight proxy
+- phase_resonance_control: reduce broad beta exposure and monitor cross-sector phase lock
+forecast:
+- 20d date=2008-09-04 level=low score=0.958 confidence=0.239 hit=0
+  reason=phase synchrony elevated; sector confirmation present
+- 60d date=2008-07-21 level=watch score=1.559 confidence=0.390 hit=0
+  reason=S_topo weakening; sector confirmation present; active vulnerability flags

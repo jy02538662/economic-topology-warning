@@ -1,1 +1,24 @@
-
+window: covid_2020
+crisis_date: 2020-02-20
+trigger_date: 2020-03-02
+trigger_level: red
+phase_sync: 0.8723726579393484
+topo_potential: -57.58474863408849
+top_defect_nodes: xom:0.891829;c:0.689826;mcd:0.459896;pep:0.436154;pg:0.393085
+top_risk_links: bac-c:0.875609;ko-pep:0.863564;ko-pg:0.826458
+sector_warn_confirmed: consumer_defensive+technology+industrial_health+financials
+sector_red_confirmed: consumer_defensive+technology+industrial_health+financials
+centralization_risk_gini: 0.174330
+redundancy_threshold_beta1_p20: 387.000000
+redundancy_risk: 0
+sync_risk: 1
+vulnerability_flags: phase_resonance
+design_suggestions:
+- reduce_coupling_on_defect_nodes:xom,c,mcd; action=review/highest-correlated exposures
+- split_strong_synchronous_links:bac-c,ko-pep,ko-pg; action=cap/rebalance 20-30pct link weight proxy
+- phase_resonance_control: reduce broad beta exposure and monitor cross-sector phase lock
+forecast:
+- 20d date=2020-02-05 level=watch score=2.104 confidence=0.526 hit=0
+  reason=S_topo weakening; phase synchrony elevated; sector confirmation present
+- 60d date=2020-02-05 level=watch score=2.104 confidence=0.526 hit=0
+  reason=S_topo weakening; phase synchrony elevated; sector confirmation present

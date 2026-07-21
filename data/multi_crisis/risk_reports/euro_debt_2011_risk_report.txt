@@ -1,0 +1,23 @@
+window: euro_debt_2011
+crisis_date: 2011-08-08
+trigger_date: 2011-11-02
+trigger_level: red
+phase_sync: 0.7351370653872236
+topo_potential: -52.20885025469896
+top_defect_nodes: db:0.800498;ing:0.747721;bcs:0.692838;ubs:0.682925;deo:0.597733
+top_risk_links: bbva-san:0.877753;db-ing:0.863564;sap-shel:0.849532
+sector_warn_confirmed: europe_technology+europe_defensive
+sector_red_confirmed: europe_financials
+centralization_risk_gini: 0.053420
+redundancy_threshold_beta1_p20: 387.000000
+redundancy_risk: 0
+sync_risk: 0
+vulnerability_flags: 
+design_suggestions:
+- reduce_coupling_on_defect_nodes:db,ing,bcs; action=review/highest-correlated exposures
+- split_strong_synchronous_links:bbva-san,db-ing,sap-shel; action=cap/rebalance 20-30pct link weight proxy
+forecast:
+- 20d date=2011-08-01 level=low score=1.008 confidence=0.252 hit=0
+  reason=phase synchrony elevated; sector confirmation present
+- 60d date=2011-06-23 level=watch score=1.722 confidence=0.430 hit=0
+  reason=S_topo weakening; phase synchrony elevated; sector confirmation present

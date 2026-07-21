@@ -1,0 +1,24 @@
+window: dotcom_2000
+crisis_date: 2000-03-10
+trigger_date: 2000-04-03
+trigger_level: red
+phase_sync: 0.8493758324929062
+topo_potential: -22.977765318914898
+top_defect_nodes: pg:0.902783;wmt:0.562165;ko:0.538137;jpm:0.411187;aapl:0.387451
+top_risk_links: bac-jpm:0.751295;bac-c:0.666536;c-jpm:0.621744
+sector_warn_confirmed: consumer_defensive+industrial_health
+sector_red_confirmed: financials
+centralization_risk_gini: 0.168702
+redundancy_threshold_beta1_p20: 387.000000
+redundancy_risk: 0
+sync_risk: 1
+vulnerability_flags: phase_resonance
+design_suggestions:
+- reduce_coupling_on_defect_nodes:pg,wmt,ko; action=review/highest-correlated exposures
+- split_strong_synchronous_links:bac-jpm,bac-c,c-jpm; action=cap/rebalance 20-30pct link weight proxy
+- phase_resonance_control: reduce broad beta exposure and monitor cross-sector phase lock
+forecast:
+- 20d date=2000-03-07 level=watch score=2.221 confidence=0.555 hit=0
+  reason=S_topo weakening; phase synchrony elevated; sector confirmation present
+- 60d date=2000-02-11 level=elevated score=2.844 confidence=0.711 hit=1
+  reason=beta0 fragmentation rising; S_topo weakening; phase synchrony elevated; sector confirmation present; active vulnerability flags
